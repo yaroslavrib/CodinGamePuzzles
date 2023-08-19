@@ -1,0 +1,99 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+#include <cmath>
+#include <sstream>
+
+using namespace std;
+
+string stream_of_consciousness = { "Did I turn the iron off?.Did I turn the iron off?.AT3A.7JA.J.Oceans11.95A.mob boss.IRS.hungry.Cute dealer.2.45T84Q.Show Girls!!.QQQ.24868.QUEEN.K837695.Is that Penn or Teller?.362436.KJ7KJ" };
+int bust_threshold = 7;
+
+string fullDeck = { "22223333444455556666777788889999TTTTJJJJQQQQKKKKAAAA" };
+string playedCards;
+string remainingDeck = fullDeck;
+
+vector<string> segments;
+stringstream ss(stream_of_consciousness);
+string segment;
+
+int allCardCount = 0;
+int brokeCardCount = 0;
+
+map<char, int> cardValues = { {'2', 2}, {'3', 3}, {'4', 4}, {'5', 5}, 
+							  {'6', 6}, {'7', 7}, {'8', 8}, {'9', 9}, 
+							  {'T', 10}, {'J', 10}, {'Q', 10}, {'K', 10}, {'A', 1}, };
+
+bool isCardValue(char c) {
+	return cardValues.find(c) != cardValues.end();
+}
+
+int main() {
+
+	setlocale(LC_ALL, "Russian");
+
+	//Фильтрация
+	while (getline(ss, segment, '.')) {
+		segments.push_back(segment);
+	}
+
+	for (const string& seg : segments) {
+		bool validSegment = true;
+		for (char c : seg) {
+			if (!isCardValue(c)) {
+				validSegment = false;
+				break;
+			}
+		}
+		if (validSegment) {
+			playedCards += seg;
+		}
+	}
+
+	//Сортировка
+	sort(playedCards.begin(), playedCards.end(), [&](char a, char b) {
+		return fullDeck.find(a) < fullDeck.find(b);
+		});
+
+	cout << "Количество карт после фильтрации: " << playedCards.size() << endl;
+
+	//Вывод на экран того что осталось после фильтрации Удалить
+	cout << "Карты после фильтрации" << endl;
+	for (char c : playedCards) {
+		cout << c;
+	}
+	cout << "\n";
+
+	//Удаляем из колоды сыграные карты
+	for (char c : playedCards) {
+		size_t pos = fullDeck.find(c);
+		if (pos != string::npos) {
+			fullDeck.erase(pos, 1);
+		}
+	}
+
+	//Вывод на экран того что осталось после удаления Удалить
+	cout << "Оставшиеся карты" << endl;
+	for (char c : fullDeck) {
+		cout << c;
+	}
+	cout << "\n";
+
+	// Подсчет количества оставшихся карт
+	for (char c : fullDeck) {
+		allCardCount++;
+		if (cardValues[c] < bust_threshold) {
+			brokeCardCount++;
+		}
+	}
+
+	cout << "Количество оставшихся карт: " << fullDeck.size() << endl;
+	cout << "Количество меньших карт: " << brokeCardCount << endl;
+
+	// Вычисляем процент
+	double result = static_cast<double> (brokeCardCount) / allCardCount * 100;
+	int persent = round(result);
+	cout << "Процент меньших карт: " << persent << "%" << endl;
+
+}
