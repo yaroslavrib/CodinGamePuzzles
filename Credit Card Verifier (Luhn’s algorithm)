@@ -1,0 +1,62 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+//string card = { "4561 2612 1234 5467" };
+string filtered;
+int firstLine = 0;
+int secondLine = 0;
+
+int main() {
+    
+    setlocale(LC_ALL, "Russian");
+
+    string card;
+    cout << "Введите номер карты: " << endl;
+    getline(cin, card);
+
+    // Убираем пробелы
+    for (char c : card) {
+        if (c == ' ') {
+            continue;
+        }
+        filtered += c;
+    }
+
+    // Разбираем символы на строки firstLine и secondLine
+    for (int i = 0; i < filtered.length(); ++i) {
+        int digit = filtered[i] - '0'; // Преобразование символа в число
+        if (i % 2 == 0) {
+            int multiplied = digit * 2;
+            if (multiplied > 9) {
+                multiplied -= 9;
+            }
+            firstLine += multiplied;
+        }
+        else {
+            secondLine += digit;
+        }
+    }
+
+    // Додаем строки
+    int totalSum = firstLine + secondLine;
+    // Вычисляем Остаток от деления на 10
+    int remainder = totalSum % 10;
+
+    
+    if (remainder == 0) {
+        cout << "Результат валидности карты: " << card << " " << "Yes" << endl;
+    }
+    else {
+        cout << "Результат валидности карты: " << card << " " << "No" << endl;
+    }
+
+    // Вывод результатов
+    cout << "Первая строка: " << firstLine << endl;
+    cout << "Вторая строка: " << secondLine << endl;
+    cout << "Сумма 2-х строк: " << firstLine + secondLine << endl;
+    cout << "Остаток от деления на 10: " << (firstLine + secondLine) % 10 << endl;
+}
